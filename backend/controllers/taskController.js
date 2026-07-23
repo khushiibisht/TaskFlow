@@ -42,7 +42,7 @@ const updateTask = async (req, res) => {
     const task = await Task.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
     if (!task) {
       return res.status(404).json({ message: "Task not found" });

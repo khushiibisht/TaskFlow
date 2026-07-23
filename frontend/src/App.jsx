@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -13,6 +14,7 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!title.trim()) return;
 
     fetch("http://localhost:3000/tasks", {
       method: "POST",
@@ -27,25 +29,59 @@ function App() {
       .catch((err) => console.error("Error creating task:", err));
   };
 
+  const toggleComplete = (task) => {
+    fetch(`http://localhost:3000/tasks/${task._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ completed: !task.completed }),
+    })
+      .then((res) => res.json())
+      .then((updatedTask) => {
+        setTasks(tasks.map((t) => (t._id === updatedTask._id ? updatedTask : t)));
+      })
+      .catch((err) => console.error("Error updating task:", err));
+  };
+
+  const deleteTask = (id) => {
+    fetch(`http://localhost:3000/tasks/${id}`, { method: "DELETE" })
+      .then(() => setTasks(tasks.filter((t) => t._id !== id)))
+      .catch((err) => console.error("Error deleting task:", err));
+  };
+
   return (
     <div>
-      <h1>TaskFlow</h1>
+      <h1 className="app-title">TaskFlow</h1>
 
-      <form onSubmit={handleSubmit}>
+      <form className="task-form" onSubmit={handleSubmit}>
         <input
+          className="task-input"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="New task title"
+          placeholder="What needs to be done?"
         />
-        <button type="submit">Add Task</button>
+        <button className="add-btn" type="submit">Add Task</button>
       </form>
 
-      <ul>
-        {tasks.map((task) => (
-          <li key={task._id}>{task.title}</li>
-        ))}
-      </ul>
+      {tasks.length === 0 ? (
+        <p className="empty-state">No tasks yet — add one above.</p>
+      ) : (
+        <ul className="task-list">
+          {tasks.map((task) => (
+            <li className="task-item" key={task._id}>
+              <span className={`task-title ${task.completed ? "completed" : ""}`}>
+                {task.title}
+              </span>
+              <div className="task-buttons">
+                <button onClick={() => toggleComplete(task)}>
+                  {task.completed ? "Undo" : "Complete"}
+                </button>
+                <button onClick={() => deleteTask(task._id)}>Delete</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
