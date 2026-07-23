@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
+
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:3000/tasks")
+    fetch(`${API_URL}/tasks`)
       .then((res) => res.json())
       .then((data) => setTasks(data))
       .catch((err) => console.error("Error fetching tasks:", err));
@@ -16,7 +19,7 @@ function App() {
     e.preventDefault();
     if (!title.trim()) return;
 
-    fetch("http://localhost:3000/tasks", {
+    fetch(`${API_URL}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title }),
@@ -30,7 +33,7 @@ function App() {
   };
 
   const toggleComplete = (task) => {
-    fetch(`http://localhost:3000/tasks/${task._id}`, {
+    fetch(`${API_URL}/tasks/${task._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ completed: !task.completed }),
@@ -43,7 +46,7 @@ function App() {
   };
 
   const deleteTask = (id) => {
-    fetch(`http://localhost:3000/tasks/${id}`, { method: "DELETE" })
+    fetch(`${API_URL}/tasks/${id}`, { method: "DELETE" })
       .then(() => setTasks(tasks.filter((t) => t._id !== id)))
       .catch((err) => console.error("Error deleting task:", err));
   };
