@@ -67,7 +67,7 @@ function App() {
       </form>
 
       {tasks.length === 0 ? (
-        <p className="empty-state">No tasks yet — add one above.</p>
+        <p className="empty-state">No tasks yet - add one above.</p>
       ) : (
         <ul className="task-list">
           {tasks.map((task) => (
